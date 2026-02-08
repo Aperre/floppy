@@ -1,0 +1,13 @@
+{
+  "itemGroup.floppy": "Example Mod Tab",
+  "block.floppy.example_block": "Example Block",
+  "item.floppy.example_item": "Example Item",
+
+  "floppy.configuration.title": "Floppy Configs",
+  "floppy.configuration.section.floppy.common.toml": "Floppy Configs",
+  "floppy.configuration.section.floppy.common.toml.title": "Floppy Configs",
+  "floppy.configuration.items": "Item List",
+  "floppy.configuration.logDirtBlock": "Log Dirt Block",
+  "floppy.configuration.magicNumberIntroduction": "Magic Number Text",
+  "floppy.configuration.magicNumber": "Magic Number"
+}
