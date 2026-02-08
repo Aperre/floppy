@@ -15,6 +15,7 @@ Or on command prompt:
 ```batch
 gradlew.bat build
 ```
+Files for each modloader are in their respective folder in build/libs/ (Eg. fabric/build/libs/floppy-{version}.jar)
 
 ## License
 This project is licensed under the MIT License. See [LICENSE.md](LICENSE.md).
