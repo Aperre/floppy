@@ -1,0 +1,66 @@
+plugins {
+    id "com.github.johnrengelman.shadow" version "8.1.1"
+}
+
+configurations {
+    shadow
+}
+
+architectury {
+    platformSetupLoomIde()
+    neoForge()
+}
+
+processResources {
+    inputs.properties([
+            mod_id: mod_id,
+            mod_name: mod_name,
+            mod_version: mod_version,
+            mod_license: mod_license,
+            minecraft_version_range: minecraft_version_range,
+            neo_version: neo_version,
+            loader_version_range: loader_version_range
+    ])
+
+    filesMatching('META-INF/neoforge.mods.toml') {
+        expand(
+                mod_id: mod_id,
+                mod_name: mod_name,
+                mod_version: mod_version,
+                mod_license: mod_license,
+                minecraft_version_range: minecraft_version_range,
+                neo_version: neo_version,
+                loader_version_range: loader_version_range
+        )
+    }
+}
+
+dependencies {
+    minecraft("com.mojang:minecraft:${minecraft_version}")
+    mappings(loom.officialMojangMappings())
+    neoForge("net.neoforged:neoforge:${neo_version}")
+
+    implementation(project(path: ":common", configuration: "namedElements")) {
+        transitive = false
+    }
+    developmentNeoForge(project(path: ":common", configuration: "namedElements")) {
+        transitive = false
+    }
+    shadow(project(path: ":common", configuration: "transformProductionNeoForge")) {
+        transitive = false
+    }
+}
+
+shadowJar {
+    relocate "dev.aqpe.floppy.common", "dev.aqpe.floppy.common.neoforge"
+    exclude "fabric.mod.json"
+
+    configurations = [project.configurations.shadow]
+    archiveClassifier = "shadow"
+}
+
+remapJar {
+    dependsOn(shadowJar)
+    inputFile.set(shadowJar.archivePath)
+    archiveClassifier = "neoforge"
+}
