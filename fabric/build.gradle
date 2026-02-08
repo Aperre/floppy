@@ -1,0 +1,15 @@
+plugins {
+    id "architectury-plugin"
+    id "dev.architectury.loom"
+}
+
+architectury {
+    fabric()
+}
+
+dependencies {
+	minecraft "com.mojang:minecraft:${project.minecraft_version}"
+    mappings loom.officialMojangMappings()
+	modImplementation "net.fabricmc:fabric-loader:${project.loader_version}"
+    implementation project(":common")
+}

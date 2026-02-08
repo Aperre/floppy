@@ -1,0 +1,23 @@
+plugins {
+    id "architectury-plugin"
+    id "dev.architectury.loom"
+    id "java"
+}
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+
+repositories {
+    maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
+    mavenCentral()
+}
+
+architectury {
+    common("fabric", "neoforge")
+}
+
+dependencies {
+    compileOnly "org.spongepowered:mixin:0.8-SNAPSHOT"
+
+    minecraft "com.mojang:minecraft:${minecraft_version}"
+    mappings loom.officialMojangMappings()
+}
