@@ -19,6 +19,7 @@ processResources {
             mod_license: mod_license,
             minecraft_version_range: minecraft_version_range,
             neo_version: neo_version,
+            neo_version_range: neo_version_range,
             loader_version_range: loader_version_range
     ])
 
@@ -30,6 +31,7 @@ processResources {
                 mod_license: mod_license,
                 minecraft_version_range: minecraft_version_range,
                 neo_version: neo_version,
+                neo_version_range: neo_version_range,
                 loader_version_range: loader_version_range
         )
     }
