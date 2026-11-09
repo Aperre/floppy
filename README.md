@@ -8,7 +8,7 @@ It will also work with all mobs that use the `AbstractFish` class.
 
 ## Fabric compatibility (1.0.2)
 
-There are two Fabric JARs because Minecraft 1.21.9 changed intermediary method mappings used by the fish mixin.
+The fish mixin references Minecraft methods that are remapped between these release groups.
 Use the JAR matching your Minecraft version:
 
 | JAR | Minecraft versions |
@@ -23,13 +23,13 @@ Minecraft 1.21.9 is intentionally not supported by either JAR.
 Build the older Fabric variant (compiled against 1.21.1):
 
 ```bash
-./gradlew :fabric:build -Pminecraft_version=1.21.1 "-Pfabric_minecraft_version_range=>=1.21.1 <1.21.9"
+./gradlew :fabric:build -Pfabric_only=true -Pminecraft_version=1.21.1 "-Pfabric_minecraft_version_range=>=1.21.1 <1.21.9"
 ```
 
 Build the newer Fabric variant (compiled against 1.21.10):
 
 ```bash
-./gradlew :fabric:build -Pminecraft_version=1.21.10 "-Pfabric_minecraft_version_range=>=1.21.10 <1.21.12"
+./gradlew :fabric:build -Pfabric_only=true -Pminecraft_version=1.21.10 "-Pfabric_minecraft_version_range=>=1.21.10 <1.21.12"
 ```
 
 Both commands write `fabric/build/libs/floppy-1.0.2-fabric.jar`; rename or copy the output before building the other variant. GitHub Actions builds and uploads both variants separately.

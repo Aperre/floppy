@@ -49,6 +49,7 @@ jobs:
       - name: Build Fabric mod against target Minecraft version
         run: |
           ./gradlew :fabric:build \
+            -Pfabric_only=true \
             "-Pminecraft_version=${{ matrix.minecraft_version }}" \
             "-Pfabric_minecraft_version_range=${{ matrix.fabric_minecraft_version_range }}"
 

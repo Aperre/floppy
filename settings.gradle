@@ -1,9 +1,9 @@
 pluginManagement {
     repositories {
         maven {
-			name = 'Fabric'
-			url = 'https://maven.fabricmc.net/'
-		}
+            name = 'Fabric'
+            url = 'https://maven.fabricmc.net/'
+        }
         maven { url "https://maven.architectury.dev/" }
         maven { url = 'https://maven.minecraftforge.net/' }
         mavenCentral()
@@ -17,4 +17,10 @@ plugins {
 
 rootProject.name = "floppy"
 
-include("common", "fabric", "neoforge")
+// Fabric CI builds compile against a selected Minecraft version. Do not include
+// NeoForge in that build: the checked-in NeoForge dependency targets 1.21.1.
+def fabricOnlyBuild = gradle.startParameter.projectProperties.get("fabric_only") == "true"
+include("common", "fabric")
+if (!fabricOnlyBuild) {
+    include("neoforge")
+}
