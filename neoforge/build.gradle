@@ -61,6 +61,6 @@ shadowJar {
 
 remapJar {
     dependsOn(shadowJar)
-    inputFile.set(shadowJar.archivePath)
+    inputFile.set(shadowJar.archiveFile)
     archiveClassifier = "neoforge"
 }
