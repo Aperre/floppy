@@ -20,7 +20,9 @@ allprojects {
     apply plugin: "architectury-plugin"
 
     group "me.shedaniel"
-    archivesBaseName = rootProject.name
+    base {
+        archivesName = rootProject.name
+    }
     version = rootProject.mod_version
 
     repositories {
