@@ -15,18 +15,6 @@ architectury {
     common("fabric", "neoforge")
 }
 
-def mcParts = minecraft_version.tokenize('.').collect { it as int }
-def fishMixinName = (mcParts.size() >= 3 && mcParts[2] >= 2)
-        ? "AbstractFishModernMixin"
-        : "AbstractFishMixin"
-
-processResources {
-    inputs.property "fish_mixin_name", fishMixinName
-    filesMatching("floppy.mixins.json") {
-        expand(fish_mixin_name: fishMixinName)
-    }
-}
-
 dependencies {
     compileOnly "org.spongepowered:mixin:0.8-SNAPSHOT"
 
