@@ -10,7 +10,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(targets = "net.minecraft.world.entity.animal.fish.AbstractFish")
-public abstract class AbstractFishMixin {
+public abstract class AbstractFishModernMixin {
 
     @Inject(at = @At("TAIL"), method = "aiStep")
     public void moveTowardsWater(CallbackInfo ci) {
