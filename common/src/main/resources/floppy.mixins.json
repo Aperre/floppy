@@ -3,7 +3,7 @@
   "package": "dev.aqpe.floppy.mixin",
   "compatibilityLevel": "JAVA_21",
   "mixins": [
-    "AbstractFishMixin"
+    "${fish_mixin_name}"
   ],
   "injectors": {
     "defaultRequire": 1
