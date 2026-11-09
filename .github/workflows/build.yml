@@ -2,10 +2,8 @@ name: Build
 
 on:
   push:
-    branches:
-      - main
-    tags:
-      - "v*"
+    branches: [main]
+    tags: ["v*"]
   pull_request:
   workflow_dispatch:
 
@@ -34,10 +32,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           java-version: "21"
-          distribution: "temurin"
+          distribution: temurin
       - uses: gradle/actions/setup-gradle@v4
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
+      - run: chmod +x ./gradlew
       - name: Build Fabric
         run: |
           ./gradlew :fabric:build -Pfabric_only=true \
@@ -52,22 +49,62 @@ jobs:
           if-no-files-found: error
 
   build-neoforge:
-    name: NeoForge - Minecraft ${{ matrix.supported_versions }}
+    name: NeoForge - Minecraft ${{ matrix.supported_version }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: false
       matrix:
         include:
           - minecraft_version: "1.21.1"
-            minecraft_version_range: "[1.21.1,1.21.9)"
+            minecraft_version_range: "[1.21.1]"
             neo_version: "21.1.265"
-            neo_version_range: "[21.1.1,)"
-            supported_versions: "1.21.1-1.21.8"
+            neo_version_range: "[21.1.265,)"
+            supported_version: "1.21.1"
+          - minecraft_version: "1.21.2"
+            minecraft_version_range: "[1.21.2]"
+            neo_version: "21.2.1-beta"
+            neo_version_range: "[21.2.1-beta,)"
+            supported_version: "1.21.2"
+          - minecraft_version: "1.21.3"
+            minecraft_version_range: "[1.21.3]"
+            neo_version: "21.3.97"
+            neo_version_range: "[21.3.97,)"
+            supported_version: "1.21.3"
+          - minecraft_version: "1.21.4"
+            minecraft_version_range: "[1.21.4]"
+            neo_version: "21.4.157"
+            neo_version_range: "[21.4.157,)"
+            supported_version: "1.21.4"
+          - minecraft_version: "1.21.5"
+            minecraft_version_range: "[1.21.5]"
+            neo_version: "21.5.98"
+            neo_version_range: "[21.5.98,)"
+            supported_version: "1.21.5"
+          - minecraft_version: "1.21.6"
+            minecraft_version_range: "[1.21.6]"
+            neo_version: "21.6.20-beta"
+            neo_version_range: "[21.6.20-beta,)"
+            supported_version: "1.21.6"
+          - minecraft_version: "1.21.7"
+            minecraft_version_range: "[1.21.7]"
+            neo_version: "21.7.25-beta"
+            neo_version_range: "[21.7.25-beta,)"
+            supported_version: "1.21.7"
+          - minecraft_version: "1.21.8"
+            minecraft_version_range: "[1.21.8]"
+            neo_version: "21.8.54"
+            neo_version_range: "[21.8.54,)"
+            supported_version: "1.21.8"
           - minecraft_version: "1.21.10"
-            minecraft_version_range: "[1.21.10,1.21.12)"
+            minecraft_version_range: "[1.21.10]"
             neo_version: "21.10.64"
-            neo_version_range: "[21.10.0,)"
-            supported_versions: "1.21.10-1.21.11"
+            neo_version_range: "[21.10.64,)"
+            supported_version: "1.21.10"
+          - minecraft_version: "1.21.11"
+            minecraft_version_range: "[1.21.11]"
+            neo_version: "21.11.48"
+            neo_version_range: "[21.11.48,)"
+            supported_version: "1.21.11"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -76,10 +113,9 @@ jobs:
       - uses: actions/setup-java@v4
         with:
           java-version: "21"
-          distribution: "temurin"
+          distribution: temurin
       - uses: gradle/actions/setup-gradle@v4
-      - name: Make Gradle wrapper executable
-        run: chmod +x ./gradlew
+      - run: chmod +x ./gradlew
       - name: Build NeoForge
         run: |
           ./gradlew :neoforge:build \
@@ -88,11 +124,11 @@ jobs:
             "-Pneo_version=${{ matrix.neo_version }}" \
             "-Pneo_version_range=${{ matrix.neo_version_range }}"
       - name: Name distributable
-        run: cp "neoforge/build/libs/floppy-1.0.2-neoforge.jar" "floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}.jar"
+        run: cp "neoforge/build/libs/floppy-1.0.2-neoforge.jar" "floppy-1.0.2-neoforge-mc${{ matrix.supported_version }}.jar"
       - uses: actions/upload-artifact@v4
         with:
-          name: floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}
-          path: floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}.jar
+          name: floppy-1.0.2-neoforge-mc${{ matrix.supported_version }}
+          path: floppy-1.0.2-neoforge-mc${{ matrix.supported_version }}.jar
           if-no-files-found: error
 
   publish:
