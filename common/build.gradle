@@ -1,10 +1,11 @@
 plugins {
-    id "architectury-plugin"
-    id "dev.architectury.loom"
     id "java"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(21)
+def modernMinecraft = minecraft_version.startsWith("26.")
+def minecraftVersion = minecraft_version
+
+java.toolchain.languageVersion = JavaLanguageVersion.of(modernMinecraft ? 25 : 21)
 
 repositories {
     maven { url = 'https://repo.spongepowered.org/repository/maven-public/' }
@@ -12,12 +13,18 @@ repositories {
 }
 
 architectury {
-    common("fabric", "neoforge")
+    // The 26.x NeoForge project is built standalone with ModDevGradle and
+    // compiles these sources directly, so it does not need a transformer target.
+    common(*(modernMinecraft ? ["fabric"] : ["fabric", "neoforge"]))
 }
 
 dependencies {
     compileOnly "org.spongepowered:mixin:0.8-SNAPSHOT"
 
     minecraft "com.mojang:minecraft:${minecraft_version}"
-    mappings loom.officialMojangMappings()
+    if (!modernMinecraft) {
+        mappings loom.officialMojangMappings()
+    } else {
+        mappings files(rootProject.file("gradle/identity-mappings.jar"))
+    }
 }

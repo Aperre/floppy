@@ -18,7 +18,7 @@ plugins {
 rootProject.name = "floppy"
 
 // Fabric CI builds compile against a selected Minecraft version. Do not include
-// NeoForge in that build: the checked-in NeoForge dependency targets 1.21.1.
+// NeoForge in that build: the checked-in NeoForge dependency may target a different version.
 def fabricOnlyBuild = gradle.startParameter.projectProperties.get("fabric_only") == "true"
 include("common", "fabric")
 if (!fabricOnlyBuild) {

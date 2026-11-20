@@ -1,68 +1,108 @@
-plugins {
-    id "com.gradleup.shadow" version "9.6.1"
+def modernMinecraft = minecraft_version.startsWith("26.")
+def minecraftVersion = minecraft_version
+
+if (modernMinecraft) {
+    apply plugin: "net.neoforged.moddev"
+} else {
+    apply plugin: "com.gradleup.shadow"
 }
 
-configurations {
-    shadow
+if (modernMinecraft) {
+    // Minecraft 26.x is shipped deobfuscated, so there is no mapping step and
+    // the shared sources can be compiled straight into the NeoForge jar.
+    sourceSets {
+        main {
+            java.srcDir rootProject.file("common/src/main/java")
+            resources.srcDir rootProject.file("common/src/main/resources")
+        }
+    }
+
+    neoForge {
+        version = neo_version
+
+        runs {
+            client {
+                client()
+            }
+            server {
+                server()
+                programArgument "--nogui"
+            }
+        }
+
+        mods {
+            "${mod_id}" {
+                sourceSet(sourceSets.main)
+            }
+        }
+    }
+
+    jar {
+        archiveClassifier = "neoforge"
+    }
+} else {
+    architectury {
+        platformSetupLoomIde()
+        neoForge()
+    }
+
+    configurations {
+        shadow
+    }
+
+    dependencies {
+        minecraft("com.mojang:minecraft:${minecraftVersion}")
+        mappings(loom.officialMojangMappings())
+        neoForge("net.neoforged:neoforge:${neo_version}")
+
+        implementation(project(path: ":common", configuration: "namedElements")) {
+            transitive = false
+        }
+        developmentNeoForge(project(path: ":common", configuration: "namedElements")) {
+            transitive = false
+        }
+        shadow(project(path: ":common", configuration: "transformProductionNeoForge")) {
+            transitive = false
+        }
+    }
+
+    shadowJar {
+        exclude "fabric.mod.json"
+
+        configurations = [project.configurations.shadow]
+        archiveClassifier = "shadow"
+    }
+
+    remapJar {
+        dependsOn(shadowJar)
+        inputFile.set(shadowJar.archiveFile)
+        archiveClassifier = "neoforge"
+    }
 }
 
-architectury {
-    platformSetupLoomIde()
-    neoForge()
-}
+def modLoaderHeader = modernMinecraft
+        ? ""
+        : "modLoader=\"javafml\"\nloaderVersion=\"${loader_version_range}\""
+def modIconEntry = modernMinecraft
+        ? 'iconFile="icon.png"'
+        : 'logoFile="icon.png"'
 
 processResources {
-    inputs.properties([
-            mod_id: mod_id,
-            mod_name: mod_name,
-            mod_version: mod_version,
-            mod_license: mod_license,
+    def replaceProperties = [
+            mod_id                 : mod_id,
+            mod_name               : mod_name,
+            mod_version            : mod_version,
+            mod_license            : mod_license,
             minecraft_version_range: minecraft_version_range,
-            neo_version: neo_version,
-            neo_version_range: neo_version_range,
-            loader_version_range: loader_version_range
-    ])
+            neo_version            : neo_version,
+            neo_version_range      : neo_version_range,
+            loader_version_range   : loader_version_range,
+            mod_loader_header      : modLoaderHeader,
+            mod_icon_entry         : modIconEntry
+    ]
+    inputs.properties(replaceProperties)
 
     filesMatching('META-INF/neoforge.mods.toml') {
-        expand(
-                mod_id: mod_id,
-                mod_name: mod_name,
-                mod_version: mod_version,
-                mod_license: mod_license,
-                minecraft_version_range: minecraft_version_range,
-                neo_version: neo_version,
-                neo_version_range: neo_version_range,
-                loader_version_range: loader_version_range
-        )
+        expand(replaceProperties)
     }
-}
-
-dependencies {
-    minecraft("com.mojang:minecraft:${minecraft_version}")
-    mappings(loom.officialMojangMappings())
-    neoForge("net.neoforged:neoforge:${neo_version}")
-
-    implementation(project(path: ":common", configuration: "namedElements")) {
-        transitive = false
-    }
-    developmentNeoForge(project(path: ":common", configuration: "namedElements")) {
-        transitive = false
-    }
-    shadow(project(path: ":common", configuration: "transformProductionNeoForge")) {
-        transitive = false
-    }
-}
-
-shadowJar {
-    relocate "dev.aqpe.floppy.common", "dev.aqpe.floppy.common.neoforge"
-    exclude "fabric.mod.json"
-
-    configurations = [project.configurations.shadow]
-    archiveClassifier = "shadow"
-}
-
-remapJar {
-    dependsOn(shadowJar)
-    inputFile.set(shadowJar.archiveFile)
-    archiveClassifier = "neoforge"
 }
