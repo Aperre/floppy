@@ -21,9 +21,15 @@ jobs:
           - minecraft_version: "1.21.1"
             fabric_minecraft_version_range: ">=1.21.1 <1.21.9"
             supported_versions: "1.21.1-1.21.8"
+            java_version: "21"
           - minecraft_version: "1.21.10"
             fabric_minecraft_version_range: ">=1.21.10 <1.21.12"
             supported_versions: "1.21.10-1.21.11"
+            java_version: "21"
+          - minecraft_version: "26.1.2"
+            fabric_minecraft_version_range: ">=26.1 <26.4"
+            supported_versions: "26.1-26.3"
+            java_version: "25"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -31,21 +37,26 @@ jobs:
           fetch-tags: true
       - uses: actions/setup-java@v4
         with:
-          java-version: "21"
+          java-version: ${{ matrix.java_version }}
           distribution: temurin
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x ./gradlew
+      - name: Read mod version
+        id: version
+        run: |
+          mod_version=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '\r')
+          echo "mod_version=${mod_version}" >> "$GITHUB_OUTPUT"
       - name: Build Fabric
         run: |
           ./gradlew :fabric:build -Pfabric_only=true \
             "-Pminecraft_version=${{ matrix.minecraft_version }}" \
             "-Pfabric_minecraft_version_range=${{ matrix.fabric_minecraft_version_range }}"
       - name: Name distributable
-        run: cp "fabric/build/libs/floppy-1.0.2-fabric.jar" "floppy-1.0.2-fabric-mc${{ matrix.supported_versions }}.jar"
+        run: cp "fabric/build/libs/floppy-${{ steps.version.outputs.mod_version }}-fabric.jar" "floppy-${{ steps.version.outputs.mod_version }}-fabric-mc${{ matrix.supported_versions }}.jar"
       - uses: actions/upload-artifact@v4
         with:
-          name: floppy-1.0.2-fabric-mc${{ matrix.supported_versions }}
-          path: floppy-1.0.2-fabric-mc${{ matrix.supported_versions }}.jar
+          name: floppy-${{ steps.version.outputs.mod_version }}-fabric-mc${{ matrix.supported_versions }}
+          path: floppy-${{ steps.version.outputs.mod_version }}-fabric-mc${{ matrix.supported_versions }}.jar
           if-no-files-found: error
 
   build-neoforge:
@@ -60,11 +71,19 @@ jobs:
             neo_version: "21.1.265"
             neo_version_range: "[21.1.265,21.9)"
             supported_versions: "1.21.1-1.21.8"
+            java_version: "21"
           - minecraft_version: "1.21.10"
             minecraft_version_range: "[1.21.10,1.21.12)"
             neo_version: "21.10.64"
             neo_version_range: "[21.10.64,21.12)"
             supported_versions: "1.21.10-1.21.11"
+            java_version: "21"
+          - minecraft_version: "26.1.2"
+            minecraft_version_range: "[26.1,26.4)"
+            neo_version: "26.1.2.128"
+            neo_version_range: "[26.1.0.0-alpha.1,26.4)"
+            supported_versions: "26.1-26.3"
+            java_version: "25"
     steps:
       - uses: actions/checkout@v4
         with:
@@ -72,10 +91,15 @@ jobs:
           fetch-tags: true
       - uses: actions/setup-java@v4
         with:
-          java-version: "21"
+          java-version: ${{ matrix.java_version }}
           distribution: temurin
       - uses: gradle/actions/setup-gradle@v4
       - run: chmod +x ./gradlew
+      - name: Read mod version
+        id: version
+        run: |
+          mod_version=$(grep '^mod_version=' gradle.properties | cut -d= -f2 | tr -d '\r')
+          echo "mod_version=${mod_version}" >> "$GITHUB_OUTPUT"
       - name: Build NeoForge
         run: |
           ./gradlew :neoforge:build \
@@ -84,11 +108,11 @@ jobs:
             "-Pneo_version=${{ matrix.neo_version }}" \
             "-Pneo_version_range=${{ matrix.neo_version_range }}"
       - name: Name distributable
-        run: cp "neoforge/build/libs/floppy-1.0.2-neoforge.jar" "floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}.jar"
+        run: cp "neoforge/build/libs/floppy-${{ steps.version.outputs.mod_version }}-neoforge.jar" "floppy-${{ steps.version.outputs.mod_version }}-neoforge-mc${{ matrix.supported_versions }}.jar"
       - uses: actions/upload-artifact@v4
         with:
-          name: floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}
-          path: floppy-1.0.2-neoforge-mc${{ matrix.supported_versions }}.jar
+          name: floppy-${{ steps.version.outputs.mod_version }}-neoforge-mc${{ matrix.supported_versions }}
+          path: floppy-${{ steps.version.outputs.mod_version }}-neoforge-mc${{ matrix.supported_versions }}.jar
           if-no-files-found: error
 
   publish:
@@ -102,7 +126,7 @@ jobs:
       - uses: actions/download-artifact@v4
         with:
           path: release-assets
-          pattern: floppy-1.0.2-*
+          pattern: floppy-*
           merge-multiple: true
       - uses: softprops/action-gh-release@v2
         with:

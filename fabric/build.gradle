@@ -16,23 +16,33 @@ configurations {
 }
 
 def fabricMinecraftVersionRange = providers.gradleProperty("fabric_minecraft_version_range")
-        .getOrElse(">=1.21.1 <1.21.9")
+        .getOrElse(">=26.1 <26.4")
+def minecraftVersion = rootProject.architectury.minecraft
+def isModernMinecraft = minecraftVersion.startsWith("26.")
+def requiredJavaVersion = isModernMinecraft ? "25" : "21"
 
 processResources {
     inputs.property "version", project.version
     inputs.property "fabric_minecraft_version_range", fabricMinecraftVersionRange
+    inputs.property "java_version", requiredJavaVersion
 
     filesMatching("fabric.mod.json") {
         expand(
                 version: project.version,
-                fabric_minecraft_version_range: fabricMinecraftVersionRange
+                fabric_minecraft_version_range: fabricMinecraftVersionRange,
+                java_version: requiredJavaVersion
         )
     }
 }
 
 dependencies {
-    minecraft "com.mojang:minecraft:${rootProject.architectury.minecraft}"
-    mappings loom.officialMojangMappings()
+    minecraft "com.mojang:minecraft:${minecraftVersion}"
+    if (!isModernMinecraft) {
+        // Minecraft 26.x ships deobfuscated, so no mappings are needed (or published).
+        mappings loom.officialMojangMappings()
+    } else {
+        mappings files(rootProject.file("gradle/identity-mappings.jar"))
+    }
     modImplementation "net.fabricmc:fabric-loader:${loader_version}"
 
     common(project(path: ":common", configuration: "namedElements")) {

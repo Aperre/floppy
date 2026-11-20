@@ -1,5 +1,4 @@
-modLoader="javafml"
-loaderVersion="${loader_version_range}"
+${mod_loader_header}
 license="${mod_license}"
 issueTrackerURL="https://github.com/Aperre/Floppy"
 
@@ -7,7 +6,7 @@ issueTrackerURL="https://github.com/Aperre/Floppy"
 modId="${mod_id}"
 version="${mod_version}"
 displayName="${mod_name}"
-logoFile="icon.png"
+${mod_icon_entry}
 authors="Ape"
 description='''
 Make fish flop back to water and survive
